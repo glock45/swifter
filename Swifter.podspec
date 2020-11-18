@@ -11,6 +11,6 @@ Pod::Spec.new do |s|
   s.tvos.deployment_target = "9.0"
   s.source                = { :git => "https://github.com/httpswift/swifter.git", :tag => "1.5.0" }
   s.source_files          = 'XCode/Sources/*.{swift}'
-  s.swift_version         = '4.2'
+  s.swift_version         = '5.0'
 
 end

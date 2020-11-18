@@ -18,6 +18,10 @@ All notable changes to this project will be documented in this file. Changes not
 
 # [Unreleased]
 
+## Fixed
+
+- Set Swift version to 5.0 in podspec. ([#475](https://github.com/httpswift/swifter/pull/475)) by [@p-krasnobrovkin-tcs](https://github.com/p-krasnobrovkin-tcs)
+
 # [1.5.0]
 
 ## Added
