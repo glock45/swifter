@@ -175,7 +175,7 @@ class SwifterTestsHttpParser: XCTestCase {
         XCTAssertEqual(resp?.headers["header2"], "2", "Parser should extract multiple headers from the request.")
 
         resp = try? parser.readHttpRequest(TestSocket("GET /some/path?subscript_query[]=1&subscript_query[]=2 HTTP/1.0\nContent-Length: 10\n\n1234567890"))
-        let queryPairs = resp?.queryParams ?? []
+        var queryPairs = resp?.queryParams ?? []
         XCTAssertEqual(queryPairs.count, 2)
         XCTAssertEqual(queryPairs.first?.0, "subscript_query[]")
         XCTAssertEqual(queryPairs.first?.1, "1")
@@ -185,5 +185,19 @@ class SwifterTestsHttpParser: XCTestCase {
         XCTAssertEqual(resp?.path, "/some/path", "Parser should extract HTTP path value from the status line.")
         XCTAssertEqual(resp?.headers["content-length"], "10", "Parser should extract Content-Length header value.")
 
+        resp = try? parser.readHttpRequest(TestSocket("GET /path[]/param?a[]=1&a[]=2&b=%20 HTTP/1.0\r\nContent-Length: 0\r\n\r\n"))
+        queryPairs = resp?.queryParams ?? []
+
+        XCTAssertEqual(resp?.path, "/path[]/param")
+        if queryPairs.count == 3 {
+            XCTAssertEqual(queryPairs[0].0, "a[]")
+            XCTAssertEqual(queryPairs[0].1, "1")
+            XCTAssertEqual(queryPairs[1].0, "a[]")
+            XCTAssertEqual(queryPairs[1].1, "2")
+            XCTAssertEqual(queryPairs[2].0, "b")
+            XCTAssertEqual(queryPairs[2].1, " ")
+        } else {
+            XCTFail("queryPairs count should be 3")
+        }
     }
 }
