@@ -83,9 +83,7 @@ public enum HttpResponse {
     case ok(HttpResponseBody), created, accepted
     case movedPermanently(String)
     case movedTemporarily(String)
-    case badRequest(HttpResponseBody?), unauthorized, forbidden, notFound, notAcceptable
-    case tooManyRequests
-    case internalServerError
+    case badRequest(HttpResponseBody?), unauthorized(HttpResponseBody?), forbidden(HttpResponseBody?), notFound(HttpResponseBody? = nil), notAcceptable(HttpResponseBody?), tooManyRequests(HttpResponseBody?), internalServerError(HttpResponseBody?)
     case raw(Int, String, [String: String]?, ((HttpResponseBodyWriter) throws -> Void)? )
 
     public var statusCode: Int {
@@ -158,7 +156,7 @@ public enum HttpResponse {
     func content() -> (length: Int, write: ((HttpResponseBodyWriter) throws -> Void)?) {
         switch self {
         case .ok(let body)             : return body.content()
-        case .badRequest(let body)     : return body?.content() ?? (-1, nil)
+        case .badRequest(let body), .unauthorized(let body), .forbidden(let body), .notFound(let body), .tooManyRequests(let body), .internalServerError(let body) : return body?.content() ?? (-1, nil)
         case .raw(_, _, _, let writer) : return (-1, writer)
         default                        : return (-1, nil)
         }

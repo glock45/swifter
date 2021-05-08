@@ -15,14 +15,14 @@ public func shareFile(_ path: String) -> ((HttpRequest) -> HttpResponse) {
                 file.close()
             })
         }
-        return .notFound
+        return .notFound()
     }
 }
 
 public func shareFilesFromDirectory(_ directoryPath: String, defaults: [String] = ["index.html", "default.html"]) -> ((HttpRequest) -> HttpResponse) {
     return { request in
         guard let fileRelativePath = request.params.first else {
-            return .notFound
+            return .notFound()
         }
         if fileRelativePath.value.isEmpty {
             for path in defaults {
@@ -50,19 +50,19 @@ public func shareFilesFromDirectory(_ directoryPath: String, defaults: [String] 
                 file.close()
             })
         }
-        return .notFound
+        return .notFound()
     }
 }
 
 public func directoryBrowser(_ dir: String) -> ((HttpRequest) -> HttpResponse) {
     return { request in
         guard let (_, value) = request.params.first else {
-            return HttpResponse.notFound
+            return .notFound()
         }
         let filePath = dir + String.pathSeparator + value
         do {
             guard try filePath.exists() else {
-                return .notFound
+                return .notFound()
             }
             if try filePath.directory() {
                 var files = try filePath.files()
@@ -85,7 +85,7 @@ public func directoryBrowser(_ dir: String) -> ((HttpRequest) -> HttpResponse) {
                     }(request)
             } else {
                 guard let file = try? filePath.openForReading() else {
-                    return .notFound
+                    return .notFound()
                 }
                 return .raw(200, "OK", [:], { writer in
                     try? writer.write(file)
@@ -93,7 +93,7 @@ public func directoryBrowser(_ dir: String) -> ((HttpRequest) -> HttpResponse) {
                 })
             }
         } catch {
-            return HttpResponse.internalServerError
+            return HttpResponse.internalServerError(.text("Internal Server Error"))
         }
     }
 }

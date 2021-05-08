@@ -112,7 +112,7 @@ open class HttpServerIO {
     }
 
     open func dispatch(_ request: HttpRequest) -> ([String: String], (HttpRequest) -> HttpResponse) {
-        return ([:], { _ in HttpResponse.notFound })
+        return ([:], { _ in HttpResponse.notFound(nil) })
     }
 
     private func handleConnection(_ socket: Socket) {
