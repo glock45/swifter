@@ -24,7 +24,7 @@ public class HttpParser {
         }
         let request = HttpRequest()
         request.method = statusLineTokens[0]
-        let encodedPath = statusLineTokens[1].addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? statusLineTokens[1]
+        let encodedPath = Self.escapingInvalidURL(statusLineTokens[1])
         let urlComponents = URLComponents(string: encodedPath)
         request.path = urlComponents?.path ?? ""
         request.queryParams = urlComponents?.queryItems?.map { ($0.name, $0.value ?? "") } ?? []
@@ -38,7 +38,17 @@ public class HttpParser {
             request.body = try readBody(socket, size: contentLengthValue)
         }
         return request
+    }
+
+    /// only escaping invalid chars，valid encodedPath keep untouched
+    static func escapingInvalidURL(_ url: String) -> String {
+        var urlAllowed: CharacterSet {
+            var v = CharacterSet.urlQueryAllowed
+            v.insert(charactersIn: "?#%")
+            return v
         }
+        return url.addingPercentEncoding(withAllowedCharacters: urlAllowed) ?? url
+    }
 
     private func readBody(_ socket: Socket, size: Int) throws -> [UInt8] {
         return try socket.read(length: size)
