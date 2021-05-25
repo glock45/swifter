@@ -149,13 +149,9 @@ open class Socket: Hashable, Equatable {
     /// - Returns: A buffer containing the bytes read
     /// - Throws: SocketError.recvFailed if unable to read bytes from the socket
     open func read(length: Int) throws -> [UInt8] {
-        var buffer = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: length)
-
-        let bytesRead = try read(into: &buffer, length: length)
-
-        let rv = [UInt8](buffer[0..<bytesRead])
-        buffer.deallocate()
-        return rv
+        return try [UInt8](unsafeUninitializedCapacity: length) { buffer, bytesRead in
+            bytesRead = try read(into: &buffer, length: length)
+        }
     }
 
     static let kBufferLength = 1024
