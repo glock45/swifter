@@ -8,7 +8,7 @@
 import Foundation
 import Dispatch
 
-public protocol HttpServerIODelegate: class {
+public protocol HttpServerIODelegate: AnyObject {
     func socketConnectionReceived(_ socket: Socket)
 }
 
